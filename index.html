@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Preview</title>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Discount Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --black-bg: #000000;
+            --red-accent: #ff0000;
+            --dark-gray: #1a1a1a;
+            --light-gray: #b3b3b3;
+            --text-color: #e6e6e6;
+            --border-color: #333333;
+            --yellow-tick: #FFD700;
+        }
+
+        body {
+            background-color: var(--black-bg);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--dark-gray);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+            padding: 40px;
+            border-radius: 10px;
+            animation: glow 1.5s infinite alternate;
+            position: relative;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+            }
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--red-accent);
+            text-shadow: 0 0 5px var(--red-accent);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--red-accent);
+        }
+        
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            transform: scale(1.1);
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1px solid var(--red-accent);
+            background-color: transparent;
+            position: relative;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: "\2713"; /* Checkmark symbol */
+            font-size: 10px;
+            color: var(--yellow-tick);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--black-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            box-shadow: inset 0 0 5px rgba(255, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--red-accent);
+            box-shadow: inset 0 0 8px rgba(255, 0, 0, 0.6);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--red-accent);
+            color: var(--black-bg);
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            transform: translateY(-2px);
+        }
+
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 5px solid var(--red-accent);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #price-display {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--light-gray);
+            font-size: 0.7em;
+        }
+
+        .discounted-price {
+            color: var(--red-accent);
+            font-size: 1.2em;
+            text-shadow: 0 0 5px var(--red-accent);
+        }
+
+        .order-summary-box {
+            background-color: var(--black-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .order-summary-box p, .order-summary-box a {
+            margin: 8px 0;
+            font-size: 1em;
+            word-wrap: break-word;
+        }
+
+        .order-summary-box span, .order-summary-box a {
+            color: var(--red-accent);
+        }
+
+        .product-preview-card {
+            display: none;
+            background-color: #2a2a2a;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .product-preview-card img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--red-accent);
+            margin-bottom: 10px;
+        }
+
+        .my-orders-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--red-accent);
+            cursor: pointer;
+            box-shadow: none;
+            width: auto;
+            padding: 0;
+            transition: color 0.3s;
+        }
+        .my-orders-button:hover {
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        .edit-icon {
+            cursor: pointer;
+            color: var(--red-accent);
+            margin-left: 10px;
+            transition: color 0.3s;
+        }
+        .edit-icon:hover {
+            color: #ffffff;
+        }
+
+        #myOrdersSection {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 200;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .my-orders-list {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--dark-gray);
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .support-info-text, #openTncModal {
+            text-decoration: underline;
+        }
+        
+        .support-info-text {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--red-accent);
+            cursor: pointer;
+        }
+        
+        .my-orders-list .order-item {
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .my-orders-list .order-item .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--red-accent);
+            margin-bottom: 10px;
+        }
+
+        .download-btn {
+            width: auto;
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 300;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: var(--dark-gray);
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+            border-radius: 10px;
+        }
+
+        .close-btn {
+            color: var(--light-gray);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: var(--red-accent);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .modal-content h2, .modal-content h3 {
+            margin-top: 0;
+            color: var(--red-accent);
+        }
+        
+        .modal-content p, .modal-content ul {
+            font-size: 0.9em;
+        }
+
+        .close-orders-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--red-accent);
+            font-size: 24px;
+            cursor: pointer;
+            width: auto;
+            padding: 0;
+            transition: color 0.3s;
+        }
+
+        .close-orders-btn:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<button id="myOrdersBtn" class="my-orders-button" title="My Orders"><i class="fa-solid fa-box-archive"></i></button>
+
+<div class="container">
+    <form id="orderForm" action="https://formspree.io/f/YOUR_FORMSPREE_FORM_ID" method="POST">
+        <div id="section1" class="section active">
+            <h1>Product Submission</h1>
+            <div class="form-group">
+                <label for="productLink">Product Link:</label>
+                <input type="url" id="productLink" name="productLink" placeholder="Paste product URL here" required>
+            </div>
+            <div class="form-group">
+                <label for="siteName">Shopping Site:</label>
+                <select id="siteName" name="siteName" required>
+                    <option value="">Select a site</option>
+                    <option value="Amazon">Amazon</option>
+                    <option value="Flipkart">Flipkart</option>
+                    <option value="Myntra">Myntra</option>
+                    <option value="Meesho">Meesho</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="officialPrice">Current Price:</label>
+                <input type="number" id="officialPrice" name="officialPrice" placeholder="Enter product price" required>
+            </div>
+            <button type="button" id="nextButton">Next</button>
+        </div>
+
+        <div id="section2" class="section">
+            <div class="product-preview-card">
+                <img id="productImage" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Product Preview Not Available:">
+            </div>
+            <h2 id="discountTitle">Discount Applied!</h2>
+            <div id="price-display">
+                <p class="original-price">Original Price: <span id="originalPriceValue"></span></p>
+                <p>Your Discounted Price:</p>
+                <p class="discounted-price" id="discountedPriceValue"></p>
+            </div>
+            <div class="form-group">
+                <label style="display: flex; align-items: center;">
+                    <input type="checkbox" id="termsCheckbox" required>
+                    <span id="openTncModal" style="color:var(--red-accent); cursor: pointer;">I agree to the T&C</span>
+                </label>
+            </div>
+            <button type="button" id="proceedButton" disabled>Proceed</button>
+        </div>
+
+        <div id="section3" class="section">
+            <h2>Delivery Details</h2>
+            <div class="form-group">
+                <label for="customerName">Full Name:</label>
+                <input type="text" id="customerName" name="customerName" required>
+            </div>
+            <div class="form-group">
+                <label for="mobileNumber">Mobile Number:</label>
+                <input type="tel" id="mobileNumber" name="mobileNumber" required>
+            </div>
+            <div class="form-group">
+                <label for="deliveryAddress">Full Address:</label>
+                <input type="text" id="deliveryAddress" name="deliveryAddress" required>
+            </div>
+            <div class="form-group">
+                <label for="pincode">Pincode:</label>
+                <input type="text" id="pincode" name="pincode" required>
+            </div>
+            <p style="text-align: center; color: var(--light-gray);">Estimated delivery: 10 days</p>
+            <button type="button" id="proceedToPayButton">Proceed to Pay</button>
+        </div>
+
+        <div id="section4" class="section">
+            <h2>Payment & Confirmation</h2>
+            <p style="text-align: center;">Scan the QR code or click the button to pay via UPI.</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <img id="qrCode" src="" alt="Payment QR Code" style="width: 200px; height: 200px; border: 2px solid var(--red-accent);">
+            </div>
+            <a id="payLink" href="#" style="display: block; text-align: center; margin-bottom: 20px;">
+                <button type="button">Open Payment App</button>
+            </a>
+
+            <div class="order-summary-box" id="orderSummaryToPDF">
+                <h3 style="text-align: center; color: var(--red-accent);">Order Summary (Read-Only)</h3>
+                <p>Product Link: <br><span id="summaryProductLink"></span></p>
+                <p>Site: <span id="summarySiteName"></span></p>
+                <p>Discounted Price: <span id="summaryDiscountedPrice"></span></p>
+                <p>Mobile Number: <span id="summaryMobileNumber"></span></p>
+                <p>Address: <span id="summaryAddress"></span> <span id="editAddressBtn" class="edit-icon" title="Edit Address"><i class="fa-solid fa-pencil"></i></span></p>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="transactionId">Enter Transaction ID:</label>
+                <input type="text" id="transactionId" name="transactionId" required>
+            </div>
+             <div class="form-group" style="margin-top: 20px;">
+                <label for="additionalNote">Additional Note:</label>
+                <textarea id="additionalNote" name="additionalNote" rows="3" placeholder="Add any specific instructions here"></textarea>
+            </div>
+
+            <input type="hidden" id="hiddenProductLink" name="Product Link">
+            <input type="hidden" id="hiddenSiteName" name="Shopping Site">
+            <input type="hidden" id="hiddenOfficialPrice" name="Official Price">
+            <input type="hidden" id="hiddenDiscountedPrice" name="Discounted Price">
+            <input type="hidden" id="hiddenCustomerName" name="Full Name">
+            <input type="hidden" id="hiddenMobileNumber" name="Mobile Number">
+            <input type="hidden" id="hiddenDeliveryAddress" name="Full Address">
+            <input type="hidden" id="hiddenPincode" name="Pincode">
+            <input type="hidden" id="hiddenTransactionId" name="Transaction ID">
+            <input type="hidden" id="hiddenAdditionalNote" name="Additional Note">
+            <input type="hidden" id="hiddenPaymentTime" name="Payment Time">
+
+            <button type="submit" id="finalSubmitButton">Final Submit</button>
+        </div>
+    </form>
+</div>
+
+<div id="tncModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Terms and Conditions</h2>
+        <p>This is a discount platform that provides discount on products from select e-commerce sites. By proceeding, you agree to the following terms:</p>
+        <ul>
+            <li>The discount is applicable only to products from the listed sites: Amazon, Flipkart, Myntra, and Meesho.</li>
+            <li>The provided product price must be accurate as of now. Official price change or any discrepancies may result in order cancellation and take 7 days to refund.</li>
+            <li>The final price shown includes a discount from our side and this the amount you are required to pay.</li>
+            <li>Delivery is estimated to take 10 business days from the date of payment confirmation and will be done by official site</li>
+            <li>You are responsible for entering the correct and valid UPI transaction ID for verification.</li>
+            <li>All personal details, including your full name, mobile number, and address, must be accurate for successful delivery. Otherwise the product will be returned after two delivery attempt with 5% penalty on refund.</li>
+            <li>By using this service, you agree to allow us to process your order details for fulfillment purposes.</li>
+            <li>For any support or queries, please contact us through the Supports option in My Orders section.</li>
+        </ul>
+        <p>Please read these terms carefully before proceeding with your order. Your use of this service constitutes your acceptance of these terms.</p>
+    </div>
+</div>
+
+<div id="supportsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Support & Policy</h2>
+        <h3>Refund and Return Policy</h3>
+        <p>Our goal is to ensure your satisfaction. If there is an issue with your order, we offer a hassle-free official site base refund and return policy under the following conditions:</p>
+        <ul>
+            <li>**Damaged Product:** If the product you receive is damaged, you can request a return within 3 days of delivery.</li>
+            <li>**Refund Process:** Upon successful return and inspection, your refund will be processed by the official e-commerce site to the original payment method within 5-7 business days.</li>
+            <li>**Non-returnable Items:** Some items, such as digital goods or personalized products, may not be eligible for return. Please check the official product description.</li>
+        </ul>
+        <h3>Contact Us</h3>
+        <p>For any support, questions about your order, Cancel or to initiate a return, please contact us using the options below:</p>
+        <p>
+            <a href="https://wa.me/9091544508" target="_blank" style="color: var(--red-accent); text-decoration: none;"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+            or
+            <a href="tel:9091544508" style="color: var(--red-accent); text-decoration: none;"><i class="fa-solid fa-phone"></i> Call</a> 9091544508
+        </p>
+    </div>
+</div>
+
+
+<div id="loading-screen">
+    <span class="loader"></span>
+</div>
+
+<div id="myOrdersSection">
+    <div class="my-orders-list">
+        <h2 style="margin-bottom: 20px;">My Orders</h2>
+        <button id="closeOrdersBtn" class="close-orders-btn" title="Close"><i class="fa-solid fa-xmark"></i></button>
+        <p id="openSupportsModal" class="support-info-text">Supports</p>
+        <div id="ordersContainer">
+            <p style="text-align: center;">No orders found.</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sections = ['section1', 'section2', 'section3', 'section4'];
+
+        const nextButton = document.getElementById('nextButton');
+        const productLinkInput = document.getElementById('productLink');
+        const officialPriceInput = document.getElementById('officialPrice');
+        const termsCheckbox = document.getElementById('termsCheckbox');
+        const proceedButton = document.getElementById('proceedButton');
+        const loadingScreen = document.getElementById('loading-screen');
+        const payLink = document.getElementById('payLink');
+        const finalSubmitButton = document.getElementById('finalSubmitButton');
+        const editAddressBtn = document.getElementById('editAddressBtn');
+        const myOrdersBtn = document.getElementById('myOrdersBtn');
+        const myOrdersSection = document.getElementById('myOrdersSection');
+        const closeOrdersBtn = document.getElementById('closeOrdersBtn');
+        const ordersContainer = document.getElementById('ordersContainer');
+        const customerNameInput = document.getElementById('customerName');
+        const mobileNumberInput = document.getElementById('mobileNumber');
+        const deliveryAddressInput = document.getElementById('deliveryAddress');
+        const pincodeInput = document.getElementById('pincode');
+        
+        const tncModal = document.getElementById('tncModal');
+        const openTncModal = document.getElementById('openTncModal');
+        const supportsModal = document.getElementById('supportsModal');
+        const openSupportsModal = document.getElementById('openSupportsModal');
+
+        function showSection(index) {
+            sections.forEach((id, i) => {
+                document.getElementById(id).classList.remove('active');
+            });
+            document.getElementById(sections[index]).classList.add('active');
+        }
+        
+        // --- Auto-fill address on page load ---
+        const lastOrder = JSON.parse(localStorage.getItem('myOrders'))?.[0];
+        if (lastOrder) {
+            customerNameInput.value = lastOrder.customerName;
+            mobileNumberInput.value = lastOrder.mobileNumber;
+            deliveryAddressInput.value = lastOrder.deliveryAddress;
+            pincodeInput.value = lastOrder.pincode;
+        }
+
+        // --- T&C Modal Logic ---
+        openTncModal.addEventListener('click', function(event) {
+            event.preventDefault();
+            tncModal.style.display = 'block';
+        });
+
+        // --- Supports Modal Logic ---
+        openSupportsModal.addEventListener('click', function() {
+            supportsModal.style.display = 'block';
+        });
+
+        // Close all modals
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                tncModal.style.display = 'none';
+                supportsModal.style.display = 'none';
+            });
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target == tncModal) {
+                tncModal.style.display = 'none';
+            }
+            if (event.target == supportsModal) {
+                supportsModal.style.display = 'none';
+            }
+        });
+
+        // --- SECTION 1 LOGIC ---
+        nextButton.addEventListener('click', function() {
+            if (!productLinkInput.value || !document.getElementById('siteName').value || !officialPriceInput.value) {
+                alert('Please fill in all the details.');
+                return;
+            }
+
+            loadingScreen.style.display = 'flex';
+
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+
+                const originalPrice = parseFloat(officialPriceInput.value);
+                const discountedPrice = (originalPrice * 0.95).toFixed(2);
+
+                document.getElementById('originalPriceValue').textContent = `₹${originalPrice}`;
+                document.getElementById('discountedPriceValue').textContent = `₹${discountedPrice}`;
+
+                showSection(1);
+            }, 5000);
+        });
+
+        // --- SECTION 2 LOGIC ---
+        termsCheckbox.addEventListener('change', function() {
+            proceedButton.disabled = !this.checked;
+        });
+
+        proceedButton.addEventListener('click', function() {
+            showSection(2);
+        });
+
+        // --- SECTION 3 LOGIC ---
+        document.getElementById('proceedToPayButton').addEventListener('click', function() {
+            const officialPrice = parseFloat(document.getElementById('officialPrice').value);
+            if (!officialPrice || !customerNameInput.value || !mobileNumberInput.value || !deliveryAddressInput.value || !pincodeInput.value) {
+                alert('Please fill in all details correctly.');
+                return;
+            }
+
+            const finalDiscountedPrice = (officialPrice * 0.95).toFixed(2);
+
+            // Construct UPI deep link
+            const upiUrl = `upi://pay?pa=oksdcb@ybl&pn=Futuristic&am=${finalDiscountedPrice}&cu=INR&tn=futuristic_product_payment`;
+            payLink.href = upiUrl;
+
+            // Generate QR code image
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+            document.getElementById('qrCode').src = qrUrl;
+
+            // Populate summary
+            const productLinkValue = productLinkInput.value;
+            document.getElementById('summaryProductLink').textContent = productLinkValue.length > 50 ? productLinkValue.substring(0, 50) + '...' : productLinkValue;
+            document.getElementById('summarySiteName').textContent = document.getElementById('siteName').value;
+            document.getElementById('summaryDiscountedPrice').textContent = `₹${finalDiscountedPrice}`;
+            document.getElementById('summaryMobileNumber').textContent = mobileNumberInput.value;
+            const fullAddress = `${customerNameInput.value}, ${deliveryAddressInput.value}, Pincode: ${pincodeInput.value}`;
+            document.getElementById('summaryAddress').textContent = fullAddress;
+
+            // Populate hidden inputs for Formspree submission
+            document.getElementById('hiddenProductLink').value = productLinkValue;
+            document.getElementById('hiddenSiteName').value = document.getElementById('siteName').value;
+            document.getElementById('hiddenOfficialPrice').value = officialPrice.toFixed(2);
+            document.getElementById('hiddenDiscountedPrice').value = finalDiscountedPrice;
+            document.getElementById('hiddenCustomerName').value = customerNameInput.value;
+            document.getElementById('hiddenMobileNumber').value = mobileNumberInput.value;
+            document.getElementById('hiddenDeliveryAddress').value = deliveryAddressInput.value;
+            document.getElementById('hiddenPincode').value = pincodeInput.value;
+
+            showSection(3);
+        });
+
+        // --- SECTION 4 LOGIC & FORM SUBMISSION ---
+        editAddressBtn.addEventListener('click', function() {
+            showSection(2);
+        });
+
+        finalSubmitButton.addEventListener('click', function(event) {
+            const transactionId = document.getElementById('transactionId').value;
+            if (!transactionId) {
+                alert('Please enter your transaction ID.');
+                event.preventDefault();
+                return;
+            }
+
+            const order = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString(),
+                productLink: document.getElementById('hiddenProductLink').value,
+                siteName: document.getElementById('hiddenSiteName').value,
+                officialPrice: document.getElementById('hiddenOfficialPrice').value,
+                discountedPrice: document.getElementById('hiddenDiscountedPrice').value,
+                customerName: document.getElementById('hiddenCustomerName').value,
+                mobileNumber: document.getElementById('hiddenMobileNumber').value,
+                deliveryAddress: document.getElementById('hiddenDeliveryAddress').value,
+                pincode: document.getElementById('hiddenPincode').value,
+                transactionId: transactionId,
+                additionalNote: document.getElementById('additionalNote').value
+            };
+
+            let orders = JSON.parse(localStorage.getItem('myOrders')) || [];
+            orders.unshift(order); // Add new order to the beginning
+            localStorage.setItem('myOrders', JSON.stringify(orders));
+
+            document.getElementById('hiddenTransactionId').value = transactionId;
+            document.getElementById('hiddenAdditionalNote').value = document.getElementById('additionalNote').value;
+            document.getElementById('hiddenPaymentTime').value = new Date().toISOString();
+        });
+
+        // --- MY ORDERS SECTION & PDF LOGIC ---
+        myOrdersBtn.addEventListener('click', function() {
+            loadOrders();
+            myOrdersSection.style.display = 'block';
+        });
+
+        closeOrdersBtn.addEventListener('click', function() {
+            myOrdersSection.style.display = 'none';
+        });
+
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('myOrders')) || [];
+            ordersContainer.innerHTML = '';
+            if (orders.length === 0) {
+                ordersContainer.innerHTML = '<p style="text-align: center; color: var(--light-gray);">No orders found.</p>';
+                return;
+            }
+
+            orders.forEach((order, index) => {
+                const orderItem = document.createElement('div');
+                orderItem.classList.add('order-item');
+                orderItem.id = `order-${order.id}`;
+                orderItem.innerHTML = `
+                    <div class="order-header">
+                        <h4>Order #${orders.length - index} - ${order.timestamp}</h4>
+                        <button class="download-btn" data-order-id="${order.id}">Download as PDF</button>
+                    </div>
+                    <p><strong>Order Value:</strong> ₹${order.discountedPrice}</p>
+                    <p><strong>Transaction ID:</strong> ${order.transactionId}</p>
+                    <p><strong>Mobile Number:</strong> ${order.mobileNumber}</p>
+                    <p><strong>Delivery Address:</strong> ${order.deliveryAddress}</p>
+                    <p><strong>Product Link:</strong> ${order.productLink}</p>
+                    ${order.additionalNote ? `<p><strong>Note:</strong> ${order.additionalNote}</p>` : ''}
+                `;
+                ordersContainer.appendChild(orderItem);
+            });
+
+            document.querySelectorAll('.download-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    downloadOrderAsPdf(orderId);
+                });
+            });
+        }
+
+        function downloadOrderAsPdf(orderId) {
+            const element = document.getElementById(`order-${orderId}`);
+            if (!element) return;
+
+            html2canvas(element).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`Order_${orderId}.pdf`);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
+</body>
+</html>
