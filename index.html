@@ -1,11 +1,4 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Preview</title>
-</head>
-<body>
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -559,6 +552,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         const sections = ['section1', 'section2', 'section3', 'section4'];
 
+        const orderForm = document.getElementById('orderForm');
         const nextButton = document.getElementById('nextButton');
         const productLinkInput = document.getElementById('productLink');
         const officialPriceInput = document.getElementById('officialPrice');
@@ -566,7 +560,6 @@
         const proceedButton = document.getElementById('proceedButton');
         const loadingScreen = document.getElementById('loading-screen');
         const payLink = document.getElementById('payLink');
-        const finalSubmitButton = document.getElementById('finalSubmitButton');
         const editAddressBtn = document.getElementById('editAddressBtn');
         const myOrdersBtn = document.getElementById('myOrdersBtn');
         const myOrdersSection = document.getElementById('myOrdersSection');
@@ -638,10 +631,17 @@
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
 
-                const originalPrice = parseFloat(officialPriceInput.value);
-                const discountedPrice = (originalPrice * 0.95).toFixed(2);
+                const officialPrice = parseFloat(officialPriceInput.value);
+                let discountedPrice;
 
-                document.getElementById('originalPriceValue').textContent = `₹${originalPrice}`;
+                // Apply conditional discount logic
+                if (officialPrice <= 5000) {
+                    discountedPrice = (officialPrice * 0.95).toFixed(2); // 5% discount
+                } else {
+                    discountedPrice = (officialPrice * 0.97).toFixed(2); // 3% discount
+                }
+
+                document.getElementById('originalPriceValue').textContent = `₹${officialPrice.toFixed(2)}`;
                 document.getElementById('discountedPriceValue').textContent = `₹${discountedPrice}`;
 
                 showSection(1);
@@ -665,7 +665,12 @@
                 return;
             }
 
-            const finalDiscountedPrice = (officialPrice * 0.95).toFixed(2);
+            let finalDiscountedPrice;
+            if (officialPrice <= 5000) {
+                finalDiscountedPrice = (officialPrice * 0.95).toFixed(2);
+            } else {
+                finalDiscountedPrice = (officialPrice * 0.97).toFixed(2);
+            }
 
             // Construct UPI deep link
             const upiUrl = `upi://pay?pa=oksdcb@ybl&pn=Futuristic&am=${finalDiscountedPrice}&cu=INR&tn=futuristic_product_payment`;
@@ -684,16 +689,6 @@
             const fullAddress = `${customerNameInput.value}, ${deliveryAddressInput.value}, Pincode: ${pincodeInput.value}`;
             document.getElementById('summaryAddress').textContent = fullAddress;
 
-            // Populate hidden inputs for Formspree submission
-            document.getElementById('hiddenProductLink').value = productLinkValue;
-            document.getElementById('hiddenSiteName').value = document.getElementById('siteName').value;
-            document.getElementById('hiddenOfficialPrice').value = officialPrice.toFixed(2);
-            document.getElementById('hiddenDiscountedPrice').value = finalDiscountedPrice;
-            document.getElementById('hiddenCustomerName').value = customerNameInput.value;
-            document.getElementById('hiddenMobileNumber').value = mobileNumberInput.value;
-            document.getElementById('hiddenDeliveryAddress').value = deliveryAddressInput.value;
-            document.getElementById('hiddenPincode').value = pincodeInput.value;
-
             showSection(3);
         });
 
@@ -701,8 +696,9 @@
         editAddressBtn.addEventListener('click', function() {
             showSection(2);
         });
-
-        finalSubmitButton.addEventListener('click', function(event) {
+        
+        // Form submission logic
+        orderForm.addEventListener('submit', function(event) {
             const transactionId = document.getElementById('transactionId').value;
             if (!transactionId) {
                 alert('Please enter your transaction ID.');
@@ -710,28 +706,45 @@
                 return;
             }
 
+            const officialPrice = parseFloat(document.getElementById('officialPrice').value);
+            let finalDiscountedPrice;
+            if (officialPrice <= 5000) {
+                finalDiscountedPrice = (officialPrice * 0.95).toFixed(2);
+            } else {
+                finalDiscountedPrice = (officialPrice * 0.97).toFixed(2);
+            }
+
+            // Populate hidden inputs right before submission
+            document.getElementById('hiddenProductLink').value = productLinkInput.value;
+            document.getElementById('hiddenSiteName').value = document.getElementById('siteName').value;
+            document.getElementById('hiddenOfficialPrice').value = officialPrice.toFixed(2);
+            document.getElementById('hiddenDiscountedPrice').value = finalDiscountedPrice;
+            document.getElementById('hiddenCustomerName').value = customerNameInput.value;
+            document.getElementById('hiddenMobileNumber').value = mobileNumberInput.value;
+            document.getElementById('hiddenDeliveryAddress').value = deliveryAddressInput.value;
+            document.getElementById('hiddenPincode').value = pincodeInput.value;
+            document.getElementById('hiddenTransactionId').value = transactionId;
+            document.getElementById('hiddenAdditionalNote').value = document.getElementById('additionalNote').value;
+            document.getElementById('hiddenPaymentTime').value = new Date().toISOString();
+
             const order = {
                 id: Date.now(),
                 timestamp: new Date().toLocaleString(),
-                productLink: document.getElementById('hiddenProductLink').value,
-                siteName: document.getElementById('hiddenSiteName').value,
-                officialPrice: document.getElementById('hiddenOfficialPrice').value,
-                discountedPrice: document.getElementById('hiddenDiscountedPrice').value,
-                customerName: document.getElementById('hiddenCustomerName').value,
-                mobileNumber: document.getElementById('hiddenMobileNumber').value,
-                deliveryAddress: document.getElementById('hiddenDeliveryAddress').value,
-                pincode: document.getElementById('hiddenPincode').value,
+                productLink: productLinkInput.value,
+                siteName: document.getElementById('siteName').value,
+                officialPrice: officialPrice.toFixed(2),
+                discountedPrice: finalDiscountedPrice,
+                customerName: customerNameInput.value,
+                mobileNumber: mobileNumberInput.value,
+                deliveryAddress: deliveryAddressInput.value,
+                pincode: pincodeInput.value,
                 transactionId: transactionId,
                 additionalNote: document.getElementById('additionalNote').value
             };
 
             let orders = JSON.parse(localStorage.getItem('myOrders')) || [];
-            orders.unshift(order); // Add new order to the beginning
+            orders.unshift(order);
             localStorage.setItem('myOrders', JSON.stringify(orders));
-
-            document.getElementById('hiddenTransactionId').value = transactionId;
-            document.getElementById('hiddenAdditionalNote').value = document.getElementById('additionalNote').value;
-            document.getElementById('hiddenPaymentTime').value = new Date().toISOString();
         });
 
         // --- MY ORDERS SECTION & PDF LOGIC ---
@@ -798,7 +811,5 @@
     });
 </script>
 
-</body>
-</html>
 </body>
 </html>
