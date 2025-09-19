@@ -625,13 +625,23 @@
                 alert('Please fill in all the details.');
                 return;
             }
+            
+            // Check if the URL starts with a protocol, if not, add it
+            if (!productLinkInput.value.startsWith('http://') && !productLinkInput.value.startsWith('https://')) {
+                productLinkInput.value = 'https://' + productLinkInput.value;
+            }
+
+            const officialPrice = parseFloat(officialPriceInput.value);
+            if (isNaN(officialPrice)) {
+                alert('Please enter a valid number for the price.');
+                return;
+            }
 
             loadingScreen.style.display = 'flex';
 
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
-
-                const officialPrice = parseFloat(officialPriceInput.value);
+                
                 let discountedPrice;
 
                 // Apply conditional discount logic
@@ -643,6 +653,10 @@
 
                 document.getElementById('originalPriceValue').textContent = `₹${officialPrice.toFixed(2)}`;
                 document.getElementById('discountedPriceValue').textContent = `₹${discountedPrice}`;
+                
+                // Store prices in hidden fields for later use
+                document.getElementById('hiddenOfficialPrice').value = officialPrice;
+                document.getElementById('hiddenDiscountedPrice').value = discountedPrice;
 
                 showSection(1);
             }, 5000);
@@ -659,18 +673,13 @@
 
         // --- SECTION 3 LOGIC ---
         document.getElementById('proceedToPayButton').addEventListener('click', function() {
-            const officialPrice = parseFloat(document.getElementById('officialPrice').value);
-            if (!officialPrice || !customerNameInput.value || !mobileNumberInput.value || !deliveryAddressInput.value || !pincodeInput.value) {
+            if (!customerNameInput.value || !mobileNumberInput.value || !deliveryAddressInput.value || !pincodeInput.value) {
                 alert('Please fill in all details correctly.');
                 return;
             }
-
-            let finalDiscountedPrice;
-            if (officialPrice <= 5000) {
-                finalDiscountedPrice = (officialPrice * 0.95).toFixed(2);
-            } else {
-                finalDiscountedPrice = (officialPrice * 0.97).toFixed(2);
-            }
+            
+            // Use the price from the hidden input field, not a recalculation
+            const finalDiscountedPrice = document.getElementById('hiddenDiscountedPrice').value;
 
             // Construct UPI deep link
             const upiUrl = `upi://pay?pa=oksdcb@ybl&pn=Futuristic&am=${finalDiscountedPrice}&cu=INR&tn=futuristic_product_payment`;
@@ -706,19 +715,9 @@
                 return;
             }
 
-            const officialPrice = parseFloat(document.getElementById('officialPrice').value);
-            let finalDiscountedPrice;
-            if (officialPrice <= 5000) {
-                finalDiscountedPrice = (officialPrice * 0.95).toFixed(2);
-            } else {
-                finalDiscountedPrice = (officialPrice * 0.97).toFixed(2);
-            }
-
             // Populate hidden inputs right before submission
             document.getElementById('hiddenProductLink').value = productLinkInput.value;
             document.getElementById('hiddenSiteName').value = document.getElementById('siteName').value;
-            document.getElementById('hiddenOfficialPrice').value = officialPrice.toFixed(2);
-            document.getElementById('hiddenDiscountedPrice').value = finalDiscountedPrice;
             document.getElementById('hiddenCustomerName').value = customerNameInput.value;
             document.getElementById('hiddenMobileNumber').value = mobileNumberInput.value;
             document.getElementById('hiddenDeliveryAddress').value = deliveryAddressInput.value;
@@ -732,8 +731,8 @@
                 timestamp: new Date().toLocaleString(),
                 productLink: productLinkInput.value,
                 siteName: document.getElementById('siteName').value,
-                officialPrice: officialPrice.toFixed(2),
-                discountedPrice: finalDiscountedPrice,
+                officialPrice: document.getElementById('hiddenOfficialPrice').value,
+                discountedPrice: document.getElementById('hiddenDiscountedPrice').value,
                 customerName: customerNameInput.value,
                 mobileNumber: mobileNumberInput.value,
                 deliveryAddress: deliveryAddressInput.value,
