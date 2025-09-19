@@ -386,9 +386,9 @@
 <button id="myOrdersBtn" class="my-orders-button" title="My Orders"><i class="fa-solid fa-box-archive"></i></button>
 
 <div class="container">
-    <form id="orderForm" action="https://formspree.io/f/YOUR_FORMSPREE_FORM_ID" method="POST">
+    <form id="orderForm" action="https://formspree.io/f/xyzdrdjj" method="POST">
         <div id="section1" class="section active">
-            <h1>Product Submission</h1>
+            <h1>Place Discount Order</h1>
             <div class="form-group">
                 <label for="productLink">Product Link:</label>
                 <input type="url" id="productLink" name="productLink" placeholder="Paste product URL here" required>
@@ -462,7 +462,7 @@
             </a>
 
             <div class="order-summary-box" id="orderSummaryToPDF">
-                <h3 style="text-align: center; color: var(--red-accent);">Order Summary (Read-Only)</h3>
+                <h3 style="text-align: center; color: var(--red-accent);">Order Summary</h3>
                 <p>Product Link: <br><span id="summaryProductLink"></span></p>
                 <p>Site: <span id="summarySiteName"></span></p>
                 <p>Discounted Price: <span id="summaryDiscountedPrice"></span></p>
@@ -471,7 +471,7 @@
             </div>
 
             <div class="form-group" style="margin-top: 20px;">
-                <label for="transactionId">Enter Transaction ID:</label>
+                <label for="transactionId">Enter Transaction ID (After Payment):</label>
                 <input type="text" id="transactionId" name="transactionId" required>
             </div>
              <div class="form-group" style="margin-top: 20px;">
@@ -491,7 +491,7 @@
             <input type="hidden" id="hiddenAdditionalNote" name="Additional Note">
             <input type="hidden" id="hiddenPaymentTime" name="Payment Time">
 
-            <button type="submit" id="finalSubmitButton">Final Submit</button>
+            <button type="submit" id="finalSubmitButton">Submit</button>
         </div>
     </form>
 </div>
