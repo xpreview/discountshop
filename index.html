@@ -384,11 +384,11 @@
             <h1>Place Discount Order</h1>
             <div class="form-group">
                 <label for="productLink">Product Link:</label>
-                <input type="url" id="productLink" name="productLink" placeholder="Paste product URL here" required>
+                <input type="url" id="productLink" placeholder="Paste product URL here" required>
             </div>
             <div class="form-group">
                 <label for="siteName">Shopping Site:</label>
-                <select id="siteName" name="siteName" required>
+                <select id="siteName" required>
                     <option value="">Select a site</option>
                     <option value="Amazon">Amazon</option>
                     <option value="Flipkart">Flipkart</option>
@@ -398,7 +398,7 @@
             </div>
             <div class="form-group">
                 <label for="officialPrice">Current Price:</label>
-                <input type="number" id="officialPrice" name="officialPrice" placeholder="Enter product price" required>
+                <input type="number" id="officialPrice" placeholder="Enter product price" required>
             </div>
             <button type="button" id="nextButton">Next</button>
         </div>
@@ -426,19 +426,19 @@
             <h2>Delivery Details</h2>
             <div class="form-group">
                 <label for="customerName">Full Name:</label>
-                <input type="text" id="customerName" name="customerName" required>
+                <input type="text" id="customerName" required>
             </div>
             <div class="form-group">
                 <label for="mobileNumber">Mobile Number:</label>
-                <input type="tel" id="mobileNumber" name="mobileNumber" required>
+                <input type="tel" id="mobileNumber" required>
             </div>
             <div class="form-group">
                 <label for="deliveryAddress">Full Address:</label>
-                <input type="text" id="deliveryAddress" name="deliveryAddress" required>
+                <input type="text" id="deliveryAddress" required>
             </div>
             <div class="form-group">
                 <label for="pincode">Pincode:</label>
-                <input type="text" id="pincode" name="pincode" required>
+                <input type="text" id="pincode" required>
             </div>
             <p style="text-align: center; color: var(--light-gray);">Estimated delivery: 10 days</p>
             <button type="button" id="proceedToPayButton">Proceed to Pay</button>
@@ -465,24 +465,23 @@
 
             <div class="form-group" style="margin-top: 20px;">
                 <label for="transactionId">Enter Transaction ID (After Payment):</label>
-                <input type="text" id="transactionId" name="transactionId" required>
+                <input type="text" id="transactionId" required>
             </div>
              <div class="form-group" style="margin-top: 20px;">
                 <label for="additionalNote">Additional Note:</label>
-                <textarea id="additionalNote" name="additionalNote" rows="3" placeholder="Add any specific instructions here"></textarea>
+                <textarea id="additionalNote" rows="3" placeholder="Add any specific instructions here"></textarea>
             </div>
-
+            
             <input type="hidden" id="hiddenProductLink" name="Product Link">
-            <input type="hidden" id="hiddenSiteName" name="Shopping Site">
             <input type="hidden" id="hiddenOfficialPrice" name="Official Price">
             <input type="hidden" id="hiddenDiscountedPrice" name="Discounted Price">
-            <input type="hidden" id="hiddenCustomerName" name="Full Name">
-            <input type="hidden" id="hiddenMobileNumber" name="Mobile Number">
-            <input type="hidden" id="hiddenDeliveryAddress" name="Full Address">
-            <input type="hidden" id="hiddenPincode" name="Pincode">
             <input type="hidden" id="hiddenTransactionId" name="Transaction ID">
+            <input type="hidden" id="hiddenPaymentTime" name="Submit Time">
+            <input type="hidden" id="hiddenCustomerName" name="Full Name">
+            <input type="hidden" id="hiddenDeliveryAddress" name="Full Address with pincode">
+            <input type="hidden" id="hiddenSiteName" name="Shopping Site Name">
+            <input type="hidden" id="hiddenMobileNumber" name="Mobile Number">
             <input type="hidden" id="hiddenAdditionalNote" name="Additional Note">
-            <input type="hidden" id="hiddenPaymentTime" name="Payment Time">
 
             <button type="submit" id="finalSubmitButton">Submit</button>
         </div>
@@ -714,25 +713,39 @@
                 event.preventDefault();
                 return;
             }
+            
+            const currentDateTime = new Date();
+            const istDateTime = currentDateTime.toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
 
             // Populate hidden inputs right before submission
             document.getElementById('hiddenProductLink').value = productLinkInput.value;
-            document.getElementById('hiddenSiteName').value = document.getElementById('siteName').value;
-            document.getElementById('hiddenCustomerName').value = customerNameInput.value;
-            document.getElementById('hiddenMobileNumber').value = mobileNumberInput.value;
-            document.getElementById('hiddenDeliveryAddress').value = deliveryAddressInput.value;
-            document.getElementById('hiddenPincode').value = pincodeInput.value;
+            document.getElementById('hiddenOfficialPrice').value = officialPriceInput.value;
+            document.getElementById('hiddenDiscountedPrice').value = document.getElementById('discountedPriceValue').textContent.replace('₹', '');
             document.getElementById('hiddenTransactionId').value = transactionId;
+            document.getElementById('hiddenPaymentTime').value = istDateTime;
+            document.getElementById('hiddenCustomerName').value = customerNameInput.value;
+            document.getElementById('hiddenDeliveryAddress').value = `${deliveryAddressInput.value}, Pincode: ${pincodeInput.value}`;
+            document.getElementById('hiddenSiteName').value = document.getElementById('siteName').value;
+            document.getElementById('hiddenMobileNumber').value = mobileNumberInput.value;
             document.getElementById('hiddenAdditionalNote').value = document.getElementById('additionalNote').value;
-            document.getElementById('hiddenPaymentTime').value = new Date().toISOString();
+            
 
             const order = {
                 id: Date.now(),
-                timestamp: new Date().toLocaleString(),
+                timestamp: istDateTime,
                 productLink: productLinkInput.value,
                 siteName: document.getElementById('siteName').value,
-                officialPrice: document.getElementById('hiddenOfficialPrice').value,
-                discountedPrice: document.getElementById('hiddenDiscountedPrice').value,
+                officialPrice: officialPriceInput.value,
+                discountedPrice: document.getElementById('discountedPriceValue').textContent.replace('₹', ''),
                 customerName: customerNameInput.value,
                 mobileNumber: mobileNumberInput.value,
                 deliveryAddress: deliveryAddressInput.value,
